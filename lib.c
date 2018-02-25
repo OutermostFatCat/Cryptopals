@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* The functions depends on a '\0' closing each string */
-
 unsigned int string_length(const char *string) {
 
 	unsigned int i = 1;
@@ -25,14 +23,14 @@ char* string_encrypt(const char *string) {
 	while (*string) {
 		switch (byte % 3) {
 			case 0x00:
-				*encrypted = *string ^ 'I'; 
+				*encrypted = *string ^ 'I';
 				break;
 			case 0x01:
 				*encrypted = *string ^ 'C';
 				break;
 			case 0x02:
 				*encrypted = *string ^ 'E';
-				break;    
+				break;
 		}
 		*++encrypted;
 		*++string;
@@ -116,4 +114,61 @@ unsigned int hammington_distance(const char *string1, const char *string2) {
 	}
 
 	return h_dist;
+}
+
+/* The functions depends on a '\0' closing each string */
+
+char *string_copy(const char *string, unsigned int length) {
+
+    if (length > string_length(string)) {
+        length = string_length(string);
+    }
+
+    unsigned int pointer_position = length;
+    char *new_string = malloc(sizeof(char) * length);
+    while (length-- > 0) {
+        *new_string++ = *string++;
+    }
+
+    return new_string - pointer_position;
+}
+
+/* get the keysize between low and high with lowest hammingtondistance, base64 text in file */
+unsigned int *get_hammingtonkeysize(int fd, unsigned int low_keysize, unsigned int high_keysize) {
+
+    char* text1;
+    char* text2;
+    unsigned int ham_dist = high_keysize * 8;
+    unsigned int key_array[3];
+    unsigned array_position = 0;
+    while (low_keysize <= high_keysize) {
+        if (read(fd, text1, low_keysize) == -1 ||
+           read(fd, text2, low_keysize) == -1 ) {
+            exit(0);
+        }
+
+        /*
+         * make text1, text2 ascii
+         * from base64
+         */
+
+        if (ham_dist > hammington_distance(text1, text2)) {
+            ham_dist = hammington_distance(text1, text2);
+            if (array_position < 2) {
+                key_array[array_position++] = low_keysize;
+            } else {
+                key_array[0] = key_array[1];
+                key_array[1] = key_array[2];
+                key_array[2] = low_keysize;
+            }
+        }
+
+        free(text1);
+        free(text2);
+        lseek(fd, -(low_keysize * 2), SEEK_CUR);
+        ++low_keysize;
+    }
+
+    unsigned int *keysize = key_array;
+    return keysize;
 }

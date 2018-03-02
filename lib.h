@@ -2,12 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-char *string_copy(const char *string, unsigned int length);
-char *string_encrypt(const char *string);
 unsigned int string_length(const char *string);
 unsigned int string_score(unsigned char *string);
-
-char *encrypt_hex(char *encrypt);
 
 unsigned int hammington_distance(unsigned char *string1,unsigned char *string2, unsigned int *length);
 unsigned int *get_hammingtonkeysize(int fd, unsigned int low_keysize, unsigned int high_keysize, unsigned int size_Keypool);

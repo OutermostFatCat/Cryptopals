@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+char *string_copy(const char *string, unsigned int length);
+char *string_encrypt(const char *string);
 unsigned int string_length(const char *string);
 unsigned int string_score(unsigned char *string);
 
@@ -17,5 +19,4 @@ unsigned char *file_decrypt(int fd, unsigned int key, char *XOR_array, int file_
 #define RAW_BLOCK_LENGTH 10
 
 int open(const char *path, int oflag, ... /* mode_t mode */ );
-off_t lseek(int fd, off_t offset, int whence);
 #define O_RDONLY 0
